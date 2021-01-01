@@ -1,0 +1,23 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-parser-deploy
+  labels:
+    app: file-parser
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: file-parser
+  template:
+    metadata:
+      labels:
+        app: file-parser
+    spec: 
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: file-parser-pod
+        image: pcarcere/filegenerator:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
