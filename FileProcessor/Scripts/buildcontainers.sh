@@ -1,8 +1,10 @@
 ﻿#!/bin/bash
-hmod +x ./buildcontainers.sh
+chmod +x ./buildcontainers.sh
 
 echo "Building filegenerator.."
-./FileGenerator/buildcontainer.sh
+chmod +x ./../FileGenerator/buildcontainer.sh
+./../FileGenerator/buildcontainer.sh
 
 echo "Running fileparser.."
-./FileParser/buildcontainer.sh
+chmod +x ./../FileParser/buildcontainer.sh
+./../FileParser/buildcontainer.sh

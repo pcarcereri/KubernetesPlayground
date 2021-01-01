@@ -1,23 +1,24 @@
 ﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: file-parser-deploy
+  name: file-processor-deploy
   labels:
-    app: file-parser
+    app: file-processor
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: file-parser
+      app: file-processor
   template:
     metadata:
       labels:
-        app: file-parser
+        app: file-processor
     spec: 
       terminationGracePeriodSeconds: 1
       containers:
-      - name: file-parser-pod
+      - name: file-generator-pod
         image: pcarcere/filegenerator:latest
         imagePullPolicy: Always
-        ports:
-        - containerPort: 8080
+      - name: file-parser-pod
+        image: pcarcere/fileparser:latest
+        imagePullPolicy: Always
