@@ -7,6 +7,7 @@ namespace FileParser
 {
     class Program
     {
+        // NOTE: below code is not state of the art and it's only as PoC 
         static void Main(string[] args)
         {
             Console.WriteLine("Parsing file..");
