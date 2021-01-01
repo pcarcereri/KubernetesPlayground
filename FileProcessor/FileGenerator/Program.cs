@@ -5,6 +5,7 @@ using System.Threading;
 
 namespace FileParser
 {
+    // NOTE: below code is not state of the art and it's only as PoC 
     class Program
     {
         static void Main(string[] args)
