@@ -19,13 +19,12 @@ namespace FileParser
             if (IsFolderPathInvalid(inputFolder))
             {
                 Console.WriteLine($"Cannot read input folder path '{inputFolder ?? string.Empty}'");
+                return;
             }
 
             while(TryGetFileToProcess(inputFolder, out string fileToProcess))
             {
-                ProcessFile(inputFolder, fileToProcess);
-                File.Delete(fileToProcess);
-
+                ProcessAndDeleteFile(inputFolder, fileToProcess);
                 Thread.Sleep(500);
             }
 
@@ -69,7 +68,7 @@ namespace FileParser
         }
 
         // TODO: refactor below method
-        private static void ProcessFile(string inputFolder, string inputFilePath)
+        private static void ProcessAndDeleteFile(string inputFolder, string inputFilePath)
         {
             var inputFileName = Path.GetFileName(inputFilePath);
             var lines = Enumerable.Empty<string>();
@@ -77,6 +76,7 @@ namespace FileParser
             {
                 Console.WriteLine($"Reading file '{inputFileName}'..");
                 lines = File.ReadAllLines(inputFilePath).Reverse();
+                File.Delete(fileToProcess);
                 Console.WriteLine($"File '{inputFileName}' deleted");
             }
             catch (Exception ex)
@@ -104,15 +104,16 @@ namespace FileParser
         // code from https://stackoverflow.com/questions/3137097/check-if-a-string-is-a-valid-windows-directory-folder-path
         private static bool IsFolderPathInvalid(string inputFolder)
         {
+            var isFolderPathValid = false;
             try
             {
                 Path.GetFullPath(inputFolder);
-                return true;
+                isFolderPathValid = true;
             }
             catch
             {
-                return false;
             }
+            return !isFolderPathValid;
         }
     }
 }

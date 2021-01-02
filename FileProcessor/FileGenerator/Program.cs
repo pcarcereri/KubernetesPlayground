@@ -16,6 +16,7 @@ namespace FileParser
             if(IsFolderPathInvalid(inputFolder))
             {
                 Console.WriteLine($"Cannot read input folder path '{inputFolder ?? string.Empty}'");
+                return;
             }
 
             DeleteAllFilesInFolder(inputFolder);
@@ -30,20 +31,21 @@ namespace FileParser
         // code from https://stackoverflow.com/questions/3137097/check-if-a-string-is-a-valid-windows-directory-folder-path
         private static bool IsFolderPathInvalid(string inputFolder)
         {
+            var isFolderPathValid = false;
             try
             {
                 Path.GetFullPath(inputFolder);
-                return true;
+                isFolderPathValid = true;
             }
             catch
             {
-                return false;
             }
+            return !isFolderPathValid;
         }
 
         private static void GenerateFile(string inputFolder)
         {
-            var outputFileName = $"File_{DateTime.Now.ToShortTimeString()}.txt";
+            var outputFileName = $"File_{DateTime.Now.ToLongTimeString()}.txt";
             var outputFilePath = Path.Combine(inputFolder, outputFileName);
 
             Console.WriteLine($"Generating file '{outputFileName}'..");
