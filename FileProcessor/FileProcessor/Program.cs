@@ -36,7 +36,7 @@ namespace FileParser
 
         private static bool TryGetAndLockFileToProcess(string inputFolder, out FileStream fileStream)
         {
-            var availableCandidateFiles = Directory.GetFiles(inputFolder).Where(file => file.EndsWith(".txt")).ToList();
+            var availableCandidateFiles = GetTextFilesInFolder(inputFolder);
             Console.WriteLine($"Retrieved {availableCandidateFiles.Count()} candidate files for processing..");
 
             bool processingAvailableCandidateFiles = true;
@@ -46,6 +46,7 @@ namespace FileParser
             {
                 var candidatefFileToProcess = availableCandidateFiles.First();
                 availableCandidateFiles.Remove(candidatefFileToProcess);
+                availableCandidateFiles = GetTextFilesInFolder(inputFolder);
 
                 Console.WriteLine($"Picked candidate file '{candidatefFileToProcess}' for processing..");
                 if (TryLockFile(candidatefFileToProcess, out FileStream stream))
@@ -58,11 +59,14 @@ namespace FileParser
                 {
                     Console.WriteLine($"Candidate file '{candidatefFileToProcess}' cannot be locked and scheduled for processing..");
                 }
-
-                availableCandidateFiles = Directory.GetFiles(inputFolder).Where(file => file.EndsWith(".txt")).ToList();
             }
 
-            return fileStream != null; 
+            return fileStream != null;
+        }
+
+        private static List<string> GetTextFilesInFolder(string inputFolder)
+        {
+            return Directory.GetFiles(inputFolder).Where(file => file.EndsWith(".txt")).Distinct().ToList();
         }
 
         // code from: https://stackoverflow.com/questions/876473/is-there-a-way-to-check-if-a-file-is-in-use
