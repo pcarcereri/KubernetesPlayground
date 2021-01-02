@@ -32,8 +32,8 @@ spec:
           limits:
             memory: "128Mi"
             cpu: "500m"
-      - name: file-parser-pod
-        image: pcarcere/fileparser:latest
+      - name: file-processor-pod
+        image: pcarcere/fileprocessor:latest
         imagePullPolicy: Always
         volumeMounts: 
         - name: files 
