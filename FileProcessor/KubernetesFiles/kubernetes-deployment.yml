@@ -15,10 +15,16 @@ spec:
         app: file-processor
     spec: 
       terminationGracePeriodSeconds: 1
+      volumes: 
+      - name: files 
+        emptyDir: {} 
       containers:
       - name: file-generator-pod
         image: pcarcere/filegenerator:latest
         imagePullPolicy: Always
+        volumeMounts: 
+        - name: files 
+          mountPath: /app/files
         resources:
           requests:
             memory: "64Mi"
@@ -29,6 +35,9 @@ spec:
       - name: file-parser-pod
         image: pcarcere/fileparser:latest
         imagePullPolicy: Always
+        volumeMounts: 
+        - name: files 
+          mountPath: /app/files
         resources:
           requests:
             memory: "64Mi"
