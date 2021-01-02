@@ -66,7 +66,10 @@ namespace FileParser
 
         private static List<string> GetTextFilesInFolder(string inputFolder)
         {
-            return Directory.GetFiles(inputFolder).Where(file => file.EndsWith(".txt")).Distinct().ToList();
+            return Directory.GetFiles(inputFolder).Where(file => file.EndsWith(".txt") && !file.EndsWith(processedFileNameEnding))
+                .Distinct()
+                .OrderBy(file => file)
+                .ToList();
         }
 
         // code from: https://stackoverflow.com/questions/876473/is-there-a-way-to-check-if-a-file-is-in-use
@@ -76,13 +79,12 @@ namespace FileParser
             {
                 fileStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None);
                 Console.WriteLine($"Candidate file '{file}' has been successfully locked..");
-                return false;
-            }
-            catch (IOException ex)
-            {
-                Console.WriteLine($"Candidate file '{file}' cannot be locked: {ex.Message}..");
-                fileStream = null;
                 return true;
+            }
+            catch (IOException)
+            {
+                fileStream = null;
+                return false;
             }
         }
 
