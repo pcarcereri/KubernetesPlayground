@@ -31,7 +31,7 @@ namespace FileParser
                 Thread.Sleep(500);
             }
 
-            Console.WriteLine($"Files processed successfully");
+            Console.WriteLine($"All available files have been processed successfully");
         }
 
         private static bool TryGetAndLockFileToProcess(string inputFolder, out FileStream fileStream)
