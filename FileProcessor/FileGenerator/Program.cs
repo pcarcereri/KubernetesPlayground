@@ -49,16 +49,16 @@ namespace FileParser
             var outputFilePath = Path.Combine(inputFolder, outputFileName);
 
             Console.WriteLine($"Generating file '{outputFileName}'..");
-                using (var outputStream = File.CreateText(outputFilePath))
+            using (var outputStream = File.CreateText(outputFilePath))
+            {
+                for (int lineNumber = 0; lineNumber < 10; lineNumber++)
                 {
-                    for (int lineNumber = 0; lineNumber < 10; lineNumber++)
-                    {
-                        var outputLine = $"Line {lineNumber}";
-                        outputStream.WriteLine(outputLine);
-                    }
+                    var outputLine = $"Line number {lineNumber}";
+                    outputStream.WriteLine(outputLine);
                 }
+            }
 
-                Console.WriteLine($"Files generated correctly");
+            Console.WriteLine($"File '{outputFileName}' generated successfully");
         }
 
         // source: https://stackoverflow.com/questions/1288718/how-to-delete-all-files-and-folders-in-a-directory

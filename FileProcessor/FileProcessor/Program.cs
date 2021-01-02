@@ -22,7 +22,10 @@ namespace FileParser
                 return;
             }
 
-            while(TryGetFileToProcess(inputFolder, out string fileToProcess))
+            // wait for the file generator to generate some file
+            Thread.Sleep(5000);
+
+            while (TryGetAndLockFileToProcess(inputFolder, out FileStream fileToProcess))
             {
                 ProcessAndDeleteFile(inputFolder, fileToProcess);
                 Thread.Sleep(500);
@@ -31,57 +34,62 @@ namespace FileParser
             Console.WriteLine($"Files processed successfully");
         }
 
-        private static bool TryGetFileToProcess(string inputFolder, out string fileToProcess)
+        private static bool TryGetAndLockFileToProcess(string inputFolder, out FileStream fileStream)
         {
             var availableCandidateFiles = Directory.GetFiles(inputFolder).Where(file => file.EndsWith(".txt")).ToList();
-            fileToProcess = string.Empty;
+            bool processingAvailableCandidateFiles = true;
+            fileStream = null;
 
-            while(availableCandidateFiles.Any() && string.IsNullOrWhiteSpace(fileToProcess))
+            while (availableCandidateFiles.Any() && processingAvailableCandidateFiles)
             {
-                fileToProcess = availableCandidateFiles.First();
-                availableCandidateFiles.Remove(fileToProcess);
+                var candidatefFileToProcess = availableCandidateFiles.First();
+                availableCandidateFiles.Remove(candidatefFileToProcess);
 
-               if(IsFileLocked(fileToProcess))
+               if(IsFileLocked(candidatefFileToProcess, out FileStream stream))
                 {
-                    return true;
+                    processingAvailableCandidateFiles = false;
+                    fileStream = stream;
                 }
             }
 
-            return false; 
+            return fileStream != null; 
         }
 
         // code from: https://stackoverflow.com/questions/876473/is-there-a-way-to-check-if-a-file-is-in-use
-        private static bool IsFileLocked(string file)
+        private static bool IsFileLocked(string file, out FileStream fileStream)
         {
             try
             {
-                using (FileStream stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None))
-                {
-                    stream.Close();
-                }
+                fileStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None);
                 return false;
             }
             catch (IOException)
             {
+                fileStream = null;
                 return true;
             }
         }
 
-        // TODO: refactor below method
-        private static void ProcessAndDeleteFile(string inputFolder, string inputFilePath)
+        // TODO: refactor below long method
+        private static void ProcessAndDeleteFile(string inputFolder, FileStream inputFileStream)
         {
+            var inputFilePath = inputFileStream.Name;
             var inputFileName = Path.GetFileName(inputFilePath);
-            var lines = Enumerable.Empty<string>();
+            var inputFileContent = string.Empty;
             try
             {
                 Console.WriteLine($"Reading file '{inputFileName}'..");
-                lines = File.ReadAllLines(inputFilePath).Reverse();
-                File.Delete(fileToProcess);
-                Console.WriteLine($"File '{inputFileName}' deleted");
+                using (inputFileStream)
+                using (var streamReader = new StreamReader(inputFileStream))
+                {
+                    inputFileContent = streamReader.ReadToEnd();
+                }
+                File.Delete(inputFilePath);
+                Console.WriteLine($"File '{inputFileName}' successfully imported and deleted");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Cannot open input file '{inputFilePath}': {ex.Message}");
+                Console.WriteLine($"Cannot open locked file '{inputFilePath}': {ex.Message}");
                 return;
             }
 
@@ -91,11 +99,8 @@ namespace FileParser
 
             using (var outputStream = File.CreateText(outputFile))
             {
-                foreach (var inputLine in lines)
-                {
-                    var outputLine = inputLine.Reverse().ToArray();
-                    outputStream.WriteLine(outputLine);
-                }
+                var reversedContent = inputFileContent.Reverse();
+                outputStream.WriteLine(reversedContent);
             }
 
             Console.WriteLine($"File {inputFileName}' processed successfully into file {outputFileName}'");
