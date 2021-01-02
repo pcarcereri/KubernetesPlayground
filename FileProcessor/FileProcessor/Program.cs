@@ -13,8 +13,6 @@ namespace FileParser
         // NOTE: below code is not state of the art and it's only as PoC 
         static void Main(string[] args)
         {
-            Console.WriteLine("Processing file..");
-
             var inputFolder = args.ElementAtOrDefault(0);
             if (IsFolderPathInvalid(inputFolder))
             {
@@ -23,8 +21,10 @@ namespace FileParser
             }
 
             // wait for the file generator to generate some file
+            Console.WriteLine("Waiting for the file generator to start..");
             Thread.Sleep(5000);
 
+            Console.WriteLine("Processing file..");
             while (TryGetAndLockFileToProcess(inputFolder, out FileStream fileToProcess))
             {
                 ProcessAndDeleteFile(inputFolder, fileToProcess);
@@ -37,6 +37,8 @@ namespace FileParser
         private static bool TryGetAndLockFileToProcess(string inputFolder, out FileStream fileStream)
         {
             var availableCandidateFiles = Directory.GetFiles(inputFolder).Where(file => file.EndsWith(".txt")).ToList();
+            Console.WriteLine($"Retrieved {availableCandidateFiles.Count()} candidate files for processing..");
+
             bool processingAvailableCandidateFiles = true;
             fileStream = null;
 
@@ -45,10 +47,12 @@ namespace FileParser
                 var candidatefFileToProcess = availableCandidateFiles.First();
                 availableCandidateFiles.Remove(candidatefFileToProcess);
 
-               if(IsFileLocked(candidatefFileToProcess, out FileStream stream))
+                Console.WriteLine($"Picked candidate file '{candidatefFileToProcess}' for processing..");
+                if (IsFileLocked(candidatefFileToProcess, out FileStream stream))
                 {
                     processingAvailableCandidateFiles = false;
                     fileStream = stream;
+                    Console.WriteLine($"Candidate file '{candidatefFileToProcess}' has been locked and scheduled for processing..");
                 }
             }
 
@@ -70,7 +74,7 @@ namespace FileParser
             }
         }
 
-        // TODO: refactor below long method
+        // TODO: refactor below long method in submethods 
         private static void ProcessAndDeleteFile(string inputFolder, FileStream inputFileStream)
         {
             var inputFilePath = inputFileStream.Name;
