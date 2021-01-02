@@ -28,7 +28,7 @@ namespace FileParser
             while (TryGetAndLockFileToProcess(inputFolder, out FileStream fileToProcess))
             {
                 ProcessAndDeleteFile(inputFolder, fileToProcess);
-                Thread.Sleep(500);
+                Thread.Sleep(1000);
             }
 
             Console.WriteLine($"All available files have been processed successfully");
@@ -46,7 +46,6 @@ namespace FileParser
             {
                 var candidatefFileToProcess = availableCandidateFiles.First();
                 availableCandidateFiles.Remove(candidatefFileToProcess);
-                availableCandidateFiles = GetTextFilesInFolder(inputFolder);
 
                 Console.WriteLine($"Picked candidate file '{candidatefFileToProcess}' for processing..");
                 if (TryLockFile(candidatefFileToProcess, out FileStream stream))
