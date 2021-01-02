@@ -45,7 +45,7 @@ namespace FileParser
 
         private static void GenerateFile(string inputFolder)
         {
-            var outputFileName = $"File_{DateTime.Now.ToLongTimeString()}.txt";
+            var outputFileName = $"File_{DateTime.Now.ToString()}.txt";
             var outputFilePath = Path.Combine(inputFolder, outputFileName);
 
             Console.WriteLine($"Generating file '{outputFileName}'..");
