@@ -19,6 +19,20 @@ spec:
       - name: file-generator-pod
         image: pcarcere/filegenerator:latest
         imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
       - name: file-parser-pod
         image: pcarcere/fileparser:latest
         imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
