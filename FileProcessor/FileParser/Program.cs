@@ -7,6 +7,8 @@ namespace FileParser
 {
     class Program
     {
+        private static string processedFileNameEnding = "_processed.txt";
+
         // NOTE: below code is not state of the art and it's only as PoC 
         static void Main(string[] args)
         {
@@ -21,6 +23,12 @@ namespace FileParser
             {
                 Console.WriteLine($"Cannot read input folder path '{inputFolder ?? string.Empty}': {ex.Message}");
                 return;
+            }
+
+            var existingProcessedFiles = Directory.GetFiles(inputFolder).Where(file => file.EndsWith(processedFileNameEnding));
+            foreach (var existingProcessedFile in existingProcessedFiles)
+            {
+                File.Delete(existingProcessedFile);
             }
 
             var availableFiles = Directory.GetFiles(inputFolder).Where(file => file.EndsWith(".txt")).OrderBy(file => file);
@@ -44,7 +52,7 @@ namespace FileParser
         {
             var inputFileName = Path.GetFileName(inputFilePath);
           
-            var outputFileName = Path.GetFileNameWithoutExtension(inputFilePath) + "_processed.txt";
+            var outputFileName = Path.GetFileNameWithoutExtension(inputFilePath) + processedFileNameEnding;
             Console.WriteLine($"Generating file '{outputFileName}'..");
 
             var outputFile = Path.Combine(inputFolder, outputFileName);
