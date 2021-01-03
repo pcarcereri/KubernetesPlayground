@@ -13,16 +13,12 @@ namespace FileParser
         // NOTE: below code is not state of the art and it's only as PoC 
         static void Main(string[] args)
         {
-            var inputFolder = args.ElementAtOrDefault(0);
+            var inputFolder = args.ElementAtOrDefault(0) ?? string.Empty;
             if (IsFolderPathInvalid(inputFolder))
             {
-                Console.WriteLine($"Cannot read input folder path '{inputFolder ?? string.Empty}'");
+                Console.WriteLine($"Cannot read input folder path '{inputFolder}'");
                 return;
             }
-
-            // wait for the file generator to generate some file
-            Console.WriteLine("Waiting for the file generator to start..");
-            Thread.Sleep(5000);
 
             Console.WriteLine("Processing file..");
             while (TryGetAndLockFileToProcess(inputFolder, out FileStream fileToProcess))
@@ -47,7 +43,6 @@ namespace FileParser
                 var candidatefFileToProcess = availableCandidateFiles.First();
                 availableCandidateFiles.Remove(candidatefFileToProcess);
 
-                Console.WriteLine($"Picked candidate file '{candidatefFileToProcess}' for processing..");
                 if (TryLockFile(candidatefFileToProcess, out FileStream stream))
                 {
                     processingAvailableCandidateFiles = false;
@@ -77,7 +72,6 @@ namespace FileParser
             try
             {
                 fileStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None);
-                Console.WriteLine($"Candidate file '{file}' has been successfully locked..");
                 return true;
             }
             catch (IOException)

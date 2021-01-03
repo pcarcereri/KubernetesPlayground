@@ -12,7 +12,7 @@ namespace FileParser
         {
             Console.WriteLine("Generating file..");
 
-            var inputFolder = args.ElementAtOrDefault(0);
+            var inputFolder = args.ElementAtOrDefault(0) ?? string.Empty;
             if(IsFolderPathInvalid(inputFolder))
             {
                 Console.WriteLine($"Cannot read input folder path '{inputFolder ?? string.Empty}'");

@@ -35,6 +35,12 @@ spec:
       - name: file-processor-pod
         image: pcarcere/fileprocessor:latest
         imagePullPolicy: Always
+        readinessProbe:
+          exec:
+            command:
+            - cd /app/files
+          initialDelaySeconds: 5 
+          periodSeconds: 5
         volumeMounts: 
         - name: files 
           mountPath: /app/files

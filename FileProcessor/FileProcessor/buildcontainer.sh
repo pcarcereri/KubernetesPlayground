@@ -1,5 +1,5 @@
 ﻿#!/bin/bash
-chmod +x ./runcontainers.sh
+chmod +x ./buildcontainer.sh
 
 echo "Building file processor.."
 docker build -t pcarcere/fileprocessor:latest .
