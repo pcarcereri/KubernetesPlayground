@@ -16,9 +16,9 @@ spec:
     spec: 
       terminationGracePeriodSeconds: 1
       volumes: 
-        - name: task-pv-storage
+        - name: file-share-volume
           persistentVolumeClaim:
-            claimName: task-pv-claim
+            claimName: file-share-volume-claim
       containers:
       - name: file-processor-pod
         image: pcarcere/fileprocessor:latest
@@ -35,7 +35,7 @@ spec:
           initialDelaySeconds: 5 
           periodSeconds: 5
         volumeMounts: 
-        - name: task-pv-storage
+        - name: file-share-volume
           mountPath: /app/files
         resources:
           requests:

@@ -24,7 +24,7 @@ namespace FileParser
             while (TryGetAndLockFileToProcess(inputFolder, out FileStream fileToProcess))
             {
                 ProcessAndDeleteFile(inputFolder, fileToProcess);
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
 
             Console.WriteLine($"All available files have been processed successfully");
@@ -32,11 +32,10 @@ namespace FileParser
 
         private static bool TryGetAndLockFileToProcess(string inputFolder, out FileStream fileStream)
         {
-            var availableCandidateFiles = GetTextFilesInFolder(inputFolder);
-            Console.WriteLine($"Retrieved {availableCandidateFiles.Count()} candidate files for processing..");
-
-            bool processingAvailableCandidateFiles = true;
             fileStream = null;
+
+            var availableCandidateFiles = GetTextFilesInFolder(inputFolder);
+            bool processingAvailableCandidateFiles = true;
 
             while (availableCandidateFiles.Any() && processingAvailableCandidateFiles)
             {
@@ -60,10 +59,14 @@ namespace FileParser
 
         private static List<string> GetTextFilesInFolder(string inputFolder)
         {
-            return Directory.GetFiles(inputFolder).Where(file => file.EndsWith(".txt") && !file.EndsWith(processedFileNameEnding))
+            var availableCandidateFiles = Directory.GetFiles(inputFolder).Where(file => file.EndsWith(".txt") && !file.EndsWith(processedFileNameEnding))
                 .Distinct()
                 .OrderBy(file => file)
                 .ToList();
+
+            Console.WriteLine($"Retrieved {availableCandidateFiles.Count()} candidate files for processing..");
+            return availableCandidateFiles;
+
         }
 
         // code from: https://stackoverflow.com/questions/876473/is-there-a-way-to-check-if-a-file-is-in-use
@@ -81,40 +84,27 @@ namespace FileParser
             }
         }
 
-        // TODO: refactor below long method in submethods 
         private static void ProcessAndDeleteFile(string inputFolder, FileStream inputFileStream)
         {
             var inputFilePath = inputFileStream.Name;
             var inputFileName = Path.GetFileName(inputFilePath);
-            var inputFileContent = string.Empty;
-            try
-            {
-                Console.WriteLine($"Reading file '{inputFileName}'..");
-                using (inputFileStream)
-                using (var streamReader = new StreamReader(inputFileStream))
-                {
-                    inputFileContent = streamReader.ReadToEnd();
-                }
-                File.Delete(inputFilePath);
-                Console.WriteLine($"File '{inputFileName}' successfully imported and deleted");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Cannot open locked file '{inputFilePath}': {ex.Message}");
-                return;
-            }
-
             var outputFileName = Path.GetFileNameWithoutExtension(inputFilePath) + processedFileNameEnding;
             var outputFile = Path.Combine(inputFolder, outputFileName);
-            Console.WriteLine($"Generating file '{outputFileName}'..");
 
+            using (inputFileStream)
+            using (var streamReader = new StreamReader(inputFileStream))
             using (var outputStream = File.CreateText(outputFile))
             {
+                var inputFileContent = streamReader.ReadToEnd();
+                Console.WriteLine($"File '{inputFileName}' imported..");
+
                 var reversedContent = inputFileContent.Reverse();
                 outputStream.WriteLine(reversedContent);
+                Console.WriteLine($"File {inputFileName}' processed successfully into file {outputFileName}'");
             }
 
-            Console.WriteLine($"File {inputFileName}' processed successfully into file {outputFileName}'");
+            File.Delete(inputFilePath);
+            Console.WriteLine($"File '{inputFileName}' deleted");
         }
 
         // code from https://stackoverflow.com/questions/3137097/check-if-a-string-is-a-valid-windows-directory-folder-path
@@ -126,9 +116,7 @@ namespace FileParser
                 Path.GetFullPath(inputFolder);
                 isFolderPathValid = true;
             }
-            catch
-            {
-            }
+            catch { }
             return !isFolderPathValid;
         }
     }

@@ -17,14 +17,14 @@ namespace FileParser
                 return;
             }
 
-            Console.WriteLine($"Generating file in folder '{inputFolder}'..");
-
+            Console.WriteLine($"Deleting all files in folder '{inputFolder}'..");
             DeleteAllFilesInFolder(inputFolder);
 
-            while(true)
+            Console.WriteLine($"Generating file in folder '{inputFolder}'..");
+            while (true)
             {
                 GenerateFile(inputFolder);
-                Thread.Sleep(500);
+                Thread.Sleep(200);
             }
         }
 
@@ -37,9 +37,7 @@ namespace FileParser
                 Path.GetFullPath(inputFolder);
                 isFolderPathValid = true;
             }
-            catch
-            {
-            }
+            catch {}
             return !isFolderPathValid;
         }
 
