@@ -24,7 +24,7 @@ namespace FileParser
             while(true)
             {
                 GenerateFile(inputFolder);
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
         }
 
@@ -45,7 +45,7 @@ namespace FileParser
 
         private static void GenerateFile(string inputFolder)
         {
-            var currentTime = DateTime.Now.ToString("HH:mm:ss");
+            var currentTime = DateTime.Now.ToString("HH:mm:ss:ff");
             var outputFileName = $"File_{currentTime}.txt";
             var outputFilePath = Path.Combine(inputFolder, outputFileName);
 
