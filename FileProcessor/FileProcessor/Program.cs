@@ -20,7 +20,7 @@ namespace FileParser
                 return;
             }
 
-            Console.WriteLine("Processing file..");
+            Console.WriteLine($"Processing file in folder '{inputFolder}'..");
             while (TryGetAndLockFileToProcess(inputFolder, out FileStream fileToProcess))
             {
                 ProcessAndDeleteFile(inputFolder, fileToProcess);

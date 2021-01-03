@@ -21,6 +21,9 @@ spec:
       containers:
       - name: file-generator-pod
         image: pcarcere/filegenerator:latest
+        env:
+          - name: INPUT_FOLDER
+            value: "./files"
         imagePullPolicy: Always
         volumeMounts: 
         - name: files 
@@ -34,11 +37,16 @@ spec:
             cpu: "500m"
       - name: file-processor-pod
         image: pcarcere/fileprocessor:latest
+        env:
+          - name: INPUT_FOLDER
+            value: "./files"
         imagePullPolicy: Always
+        # processor is ready when the file generator has generated some file in /app/files folder
         readinessProbe:
           exec:
             command:
-            - cd /app/files
+            - find 
+            - /app/files
           initialDelaySeconds: 5 
           periodSeconds: 5
         volumeMounts: 

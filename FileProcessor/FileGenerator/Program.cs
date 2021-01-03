@@ -10,14 +10,14 @@ namespace FileParser
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Generating file..");
-
             var inputFolder = args.ElementAtOrDefault(0) ?? string.Empty;
             if(IsFolderPathInvalid(inputFolder))
             {
                 Console.WriteLine($"Cannot read input folder path '{inputFolder ?? string.Empty}'");
                 return;
             }
+
+            Console.WriteLine($"Generating file in folder '{inputFolder}'..");
 
             DeleteAllFilesInFolder(inputFolder);
 
