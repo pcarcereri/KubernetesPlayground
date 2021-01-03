@@ -5,7 +5,7 @@ metadata:
   labels:
     app: file-processor
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: file-processor
@@ -19,22 +19,6 @@ spec:
       - name: files 
         emptyDir: {} 
       containers:
-      - name: file-generator-pod
-        image: pcarcere/filegenerator:latest
-        env:
-          - name: INPUT_FOLDER
-            value: "./files"
-        imagePullPolicy: Always
-        volumeMounts: 
-        - name: files 
-          mountPath: /app/files
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "250m"
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
       - name: file-processor-pod
         image: pcarcere/fileprocessor:latest
         env:

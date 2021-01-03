@@ -1,0 +1,37 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-generator-deploy
+  labels:
+    app: file-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: file-generator
+  template:
+    metadata:
+      labels:
+        app: file-generator
+    spec: 
+      terminationGracePeriodSeconds: 1
+      volumes: 
+      - name: files 
+        emptyDir: {} 
+      containers:
+      - name: file-generator-pod
+        image: pcarcere/filegenerator:latest
+        env:
+          - name: INPUT_FOLDER
+            value: "./files"
+        imagePullPolicy: Always
+        volumeMounts: 
+        - name: files 
+          mountPath: /app/files
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"

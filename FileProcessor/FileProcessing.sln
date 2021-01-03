@@ -5,7 +5,6 @@ VisualStudioVersion = 16.0.808.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3F330995-0D18-447F-BCE8-7EDDDFC9AA3E}"
 	ProjectSection(SolutionItems) = preProject
-		KubernetesFiles\kubernetes-deployment.yml = KubernetesFiles\kubernetes-deployment.yml
 		Scripts\buildcontainers.sh = Scripts\buildcontainers.sh
 		Scripts\deploykubernetes.sh = Scripts\deploykubernetes.sh
 		Scripts\runcontainers.sh = Scripts\runcontainers.sh
