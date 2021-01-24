@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment-deployment
+  labels:
+    app: api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-deployment
+  template:
+    metadata:
+      labels:
+        app: api-deployment
+    spec:
+      terminationGracePeriodSeconds: 1
+      volumes: 
+        - name: file-share-volume
+          persistentVolumeClaim:
+            claimName: file-share-volume-claim
+      containers:
+      - name: api-deployment-pod
+        image: nginx:alpine
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        volumeMounts: 
+          - name: file-share-volume
+            mountPath: /home/files
+        resources:
+          limits:
+            memory: "128Mi" #128 MB
+            cpu: "200m" #200 millicpu (.2 cpu or 20% of the cpu)
+        livenessProbe:
+          httpGet:
+            path: /index.html
+            port: 80
+          initialDelaySeconds: 15
+          timeoutSeconds: 2 # Default is 1
+          periodSeconds: 5 # Default is 10
+          failureThreshold: 1 # Default is 3
+        readinessProbe:
+          httpGet:
+            path: /index.html
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 5 # Default is 10
+          failureThreshold: 1 # Default is 3
+
+    # kubectl exec pod-name -c container-name -it /bin/sh
