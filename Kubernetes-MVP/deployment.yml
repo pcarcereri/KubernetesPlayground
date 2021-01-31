@@ -47,7 +47,7 @@ spec:
             cpu: "200m" #200 millicpu (.2 cpu or 20% of the cpu)
         livenessProbe:
           httpGet:
-            path: /index.html
+            path: /hc
             port: 80
           initialDelaySeconds: 15
           timeoutSeconds: 2 # Default is 1
