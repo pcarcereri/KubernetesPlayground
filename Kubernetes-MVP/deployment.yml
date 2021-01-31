@@ -18,16 +18,29 @@ spec:
         - name: file-share-volume
           persistentVolumeClaim:
             claimName: file-share-volume-claim
+        - name: app-config-volume
+          configMap:
+            name: app-config
+        - name: secrets
+          secret:
+            secretName: secret-appsettings
       containers:
       - name: api-deployment-pod
-        image: nginx:alpine
-        imagePullPolicy: Always
-        sessionAffinity: ClientIP
+        image: samplewebapi:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 80
         volumeMounts: 
           - name: file-share-volume
             mountPath: /home/files
+          - name: app-config-volume
+            mountPath: /app/config
+          - name: secrets
+            mountPath: /app/sensitive-config
+            readOnly: true
+        env:
+        - name: ASPNETCORE_URLS
+          value: "http://+:80"
         resources:
           limits:
             memory: "128Mi" #128 MB
@@ -47,5 +60,3 @@ spec:
           initialDelaySeconds: 3
           periodSeconds: 5 # Default is 10
           failureThreshold: 1 # Default is 3
-
-    # kubectl exec pod-name -c container-name -it /bin/sh
