@@ -14,7 +14,6 @@ spec:
       labels:
         app: api-deployment
     spec:
-      terminationGracePeriodSeconds: 1
       volumes: 
         - name: file-share-volume
           persistentVolumeClaim:
@@ -23,6 +22,7 @@ spec:
       - name: api-deployment-pod
         image: nginx:alpine
         imagePullPolicy: Always
+        sessionAffinity: ClientIP
         ports:
         - containerPort: 80
         volumeMounts: 
