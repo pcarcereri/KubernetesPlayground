@@ -15,9 +15,9 @@ spec:
         app: api-deployment
     spec:
       volumes: 
-        - name: file-share-volume
+        - name: file-share
           persistentVolumeClaim:
-            claimName: file-share-volume-claim
+            claimName: file-share-claim
         - name: app-config-volume
           configMap:
             name: app-config
@@ -31,7 +31,7 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts: 
-          - name: file-share-volume
+          - name: file-share
             mountPath: /home/files
           - name: app-config-volume
             mountPath: /app/config

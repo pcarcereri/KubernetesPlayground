@@ -1,26 +1,50 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+# The reclaim policy applies to the persistent volumes not the storage class itself. 
+# pvs and pvcs that are created using that storage class will inherit the reclaim policy set here.
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+
+---
+
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: file-share-volume
-  labels:
-    type: local
+  name: file-share
 spec:
-  storageClassName: manual
   capacity:
-    storage: 10Gi
+    storage: 1Gi
+  # volumeMode block feature gate enabled by default with 1.13+
+  volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/files"
+  - ReadWriteOnce
+  # StorageClass has a reclaim policy default so it'll be "inherited" by the PV
+  # persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /tmp/data/db
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - docker-desktop
+
 ---
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: file-share-volume-claim
+  name: file-share-claim
 spec:
-  storageClassName: manual
   accessModes:
-    - ReadWriteOnce
+  - ReadWriteOnce
+  storageClassName: local-storage
   resources:
     requests:
-      storage: 3Gi
+      storage: 1Gi
