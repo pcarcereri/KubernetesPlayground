@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mssql-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mssql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mssql
+    spec:
+      securityContext:
+        fsGroup: 10001
+      containers:
+      - name: mssql
+        image: 'mcr.microsoft.com/mssql/server:2019-CU4-ubuntu-18.04'
+        ports:
+        - containerPort: 1433
+        env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mssql
+              key: SA_PASSWORD 
+        resources:
+          limits:
+            memory: "1024Mi" 
+            cpu: "200m"
+        volumeMounts:
+        - name: database-share-volume
+          mountPath: /var/opt/mssql
+      volumes:
+      - name: database-share-volume
+        persistentVolumeClaim:
+          claimName: database-share-volume-claim
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mssql
+type: Opaque
+data:
+  SA_PASSWORD: UzBtZXRoaW5nU0BTdHIwbmch
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: database-share-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/files"
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: database-share-volume-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
