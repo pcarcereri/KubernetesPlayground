@@ -1,47 +1,66 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: mssql-deployment
+# source code: https://stackoverflow.com/questions/63217356/sql-server-pods-with-persistentvolumeclaim
+# sqlserver.yaml
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: sqlserver
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: mssql
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: mssql
-    spec:
-      securityContext:
-        fsGroup: 10001
-      containers:
-      - name: mssql
-        image: 'mcr.microsoft.com/mssql/server:2017-latest'
-        ports:
-        - containerPort: 1433
-        env:
-        - name: ACCEPT_EULA
-          value: "Y"
-        - name: MSSQL_PID
-          value: "Developer"
-        - name: MSSQL_SA_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mssql
-              key: SA_PASSWORD 
-        resources:
-          limits:
-            memory: "1024Mi" 
-            cpu: "200m"
-        volumeMounts:
-        - name: database-share-volume
-          mountPath: /var/opt/mssql
-      volumes:
-      - name: database-share-volume
-        persistentVolumeClaim:
-          claimName: database-share-volume-claim
+  initContainers:
+  - name: volume-permissions
+    image: busybox
+    command: ["sh", "-c", "chown -R 10001:0 /var/opt/mssql"]
+    volumeMounts:
+    - mountPath: "/var/opt/mssql"
+      name: sqldata-storage
+  volumes:
+  - name: sqldata-storage
+    persistentVolumeClaim:
+      claimName: dbclaim
+  containers:
+  - image: mcr.microsoft.com/mssql/server
+    name: foo
+    volumeMounts:
+    - mountPath: "/var/opt/mssql/data"
+      name: sqldata-storage
+    env:
+    - name: ACCEPT_EULA
+      value: "Y"
+    - name: SA_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: mssql
+          key: SA_PASSWORD
+    - name: MSSQL_PID
+      value: Developer
+
+---
+
+#pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sqldata-storage
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/sqldata"
+  
+---
+
+#pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dbclaim
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
 
 ---
 apiVersion: v1
@@ -52,33 +71,3 @@ type: Opaque
 data:
   SA_PASSWORD: UzBtZXRoaW5nU0BTdHIwbmch
 
----
-
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: database-share-volume
-  labels:
-    type: local
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/files"
-
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: database-share-volume-claim
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 3Gi
