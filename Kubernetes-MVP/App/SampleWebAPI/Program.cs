@@ -18,11 +18,6 @@ namespace SampleWebAPI
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration(c =>
-                {
-                    c.AddJsonFile("config/appsettings.json", optional: true, reloadOnChange: true);
-                    c.AddJsonFile("sensitive-config/appsettings.secrets.json", optional: true);
-                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

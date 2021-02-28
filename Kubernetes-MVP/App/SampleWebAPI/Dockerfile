@@ -15,4 +15,3 @@ FROM mcr.microsoft.com/dotnet/sdk:3.1
 WORKDIR /app
 COPY --from=build-env /app/out .
 ENTRYPOINT dotnet SampleWebAPI.dll
-#ENTRYPOINT sleep 10000

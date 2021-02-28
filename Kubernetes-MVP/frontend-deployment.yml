@@ -26,13 +26,11 @@ spec:
             secretName: secret-appsettings
       containers:
       - name: api-deployment-pod
-        image: samplewebapi:latest
+        image: pcarcere/samplewebapi:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 80
         volumeMounts: 
-          - name: file-share
-            mountPath: /home/files
           - name: app-config-volume
             mountPath: /app/config
           - name: secrets
@@ -45,21 +43,6 @@ spec:
           limits:
             memory: "128Mi" #128 MB
             cpu: "200m" #200 millicpu (.2 cpu or 20% of the cpu)
-        livenessProbe:
-          httpGet:
-            path: /hc
-            port: 80
-          initialDelaySeconds: 15
-          timeoutSeconds: 2 # Default is 1
-          periodSeconds: 5 # Default is 10
-          failureThreshold: 1 # Default is 3
-        readinessProbe:
-          httpGet:
-            path: /index.html
-            port: 80
-          initialDelaySeconds: 3
-          periodSeconds: 5 # Default is 10
-          failureThreshold: 1 # Default is 3
 
 ---
 
