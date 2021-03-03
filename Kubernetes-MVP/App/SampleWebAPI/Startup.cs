@@ -34,9 +34,10 @@ namespace SampleWebAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // see https://medium.com/@aevitas/expose-asp-net-core-metrics-with-prometheus-15e3356415f4
             app.UseMetricServer();
             app.UseHttpMetrics();
-            app.UseMiddleware<ResponseMetricMiddleware>();
+            // app.UseMiddleware<ResponseMetricMiddleware>();
 
             if (env.IsDevelopment())
             {
