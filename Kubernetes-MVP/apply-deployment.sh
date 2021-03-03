@@ -1,6 +1,5 @@
 chmod +x ./apply-deployment.sh
 
-kubectl delete deployment api-deployment
-kubectl delete pod sqlserver
+kubectl delete deployment frontend-deployment
 
-kubectl apply -f . 
+kubectl apply -f frontend-deployment.yml
